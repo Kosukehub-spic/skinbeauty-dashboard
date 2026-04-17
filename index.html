@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKINBEAUTY Daily Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre&#43;Baskerville:wght@700&amp;family=Cormorant&#43;Infant:wght@300&amp;family=Cormorant&#43;Garamond:ital,wght@0,300;0,400;1,300&amp;family=Noto&#43;Serif&#43;JP:wght@300;400&amp;display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Cormorant Garamond", "Noto Serif JP", "Hiragino Mincho ProN", Georgia, serif; background: #F8F5F0; color: #1A1A1A; }
+
+ 
+.hero {
+  position: relative;
+  height: 120px;
+  overflow: hidden;
+  background: #B8AFA6;
+}
+.hero-center {
+  position: absolute; inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+}
+.logo-lypo {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: 22px; font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #fff;
+  line-height: 1;
+}
+.logo-sb {
+  font-family: 'Cormorant Infant', 'Cormorant Garamond', Georgia, serif;
+  font-size: 32px; font-weight: 300;
+  letter-spacing: 0.22em;
+  color: rgba(255,255,255,0.92);
+  line-height: 1;
+  display: inline-block;
+  transform: scaleX(0.82);
+  transform-origin: left center;
+}
+.hero-date {
+  position: absolute; bottom: 10px; left: 0; right: 0;
+  text-align: center;
+  font-size: 10px; font-weight: 300;
+  letter-spacing: 0.2em; color: rgba(255,255,255,0.65);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+ 
+.container { max-width: 840px; margin: 0 auto; padding: 22px 16px 40px; }
+
+.section-header { display: flex; align-items: center; gap: 10px; margin: 26px 0 13px; }
+.section-tag { font-size: 9px; font-weight: 400; padding: 3px 11px; border-radius: 1px; letter-spacing: 0.2em; text-transform: uppercase; }
+.tag-toc { background: #2A1E12; color: #D4B88A; }
+.tag-tob { background: #3D3020; color: #D4B88A; }
+.section-name { font-size: 14px; font-weight: 300; letter-spacing: 0.1em; color: #2A1E12; }
+
+ 
+.metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 9px; margin-bottom: 10px; }
+.card { background: #fff; border-radius: 1px; border: 0.5px solid #E0D8CE; }
+.metric-card { padding: 15px 17px; }
+.metric-label { font-size: 10px; color: #9A8878; margin-bottom: 7px; letter-spacing: 0.07em; }
+.metric-value { font-size: 23px; font-weight: 300; color: #1A1A1A; line-height: 1; letter-spacing: 0.02em; }
+.metric-value.gold { color: #A07830; }
+.metric-sub { font-size: 10px; color: #B8A890; margin-top: 5px; letter-spacing: 0.04em; }
+
+ 
+.channel-card { padding: 17px 19px; margin-bottom: 10px; }
+.card-title { font-size: 10px; color: #9A8878; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 14px; }
+.channel-bar-wrap { border-radius: 1px; overflow: hidden; height: 5px; display: flex; margin-bottom: 13px; background: #EDE6DC; }
+.bar-shopify { background: #5A4A38; }
+.bar-amazon  { background: #C9A96E; }
+.bar-other   { background: #C0B4A4; }
+.channel-rows { display: flex; flex-direction: column; gap: 7px; }
+.channel-row  { display: flex; align-items: center; justify-content: space-between; }
+.channel-name { display: flex; align-items: center; font-size: 12px; color: #4A4038; letter-spacing: 0.04em; }
+.channel-dot  { width: 7px; height: 7px; border-radius: 1px; margin-right: 9px; flex-shrink: 0; }
+.channel-amount { font-weight: 400; color: #1A1A1A; font-size: 13px; }
+.channel-pct    { font-size: 10px; color: #B8A890; margin-left: 8px; }
+
+ 
+.chart-card { padding: 17px 19px; margin-bottom: 10px; }
+.chart-wrap { position: relative; height: 200px; }
+
+ 
+.rank-card { padding: 17px 19px; margin-bottom: 10px; }
+.rank-header { font-size: 10px; color: #9A8878; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 13px; display: flex; justify-content: space-between; align-items: center; }
+.rank-toggle { font-size: 10px; color: #A07830; background: none; border: 0.5px solid #D4B88A; padding: 3px 10px; border-radius: 1px; letter-spacing: 0.06em; cursor: pointer; font-family: inherit; }
+.rank-toggle:hover { background: #FAF5EE; }
+.rank-table { width: 100%; border-collapse: collapse; }
+.rank-table th { font-size: 9px; color: #B8A890; font-weight: 400; padding: 0 7px 9px; text-align: left; border-bottom: 0.5px solid #EDE6DC; letter-spacing: 0.08em; text-transform: uppercase; }
+.rank-table th.r { text-align: right; }
+.rank-table td { padding: 8px 7px; border-bottom: 0.5px solid #F5F0EA; color: #2A2018; vertical-align: middle; font-size: 12px; }
+.rank-table td.r { text-align: right; color: #1A1A1A; font-variant-numeric: tabular-nums; }
+.rank-table tr:last-child td { border-bottom: none; }
+.rank-table tr:hover td { background: #FAFAF7; }
+.rank-num { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 1px; font-size: 10px; background: #F0EBE3; color: #8A8078; }
+.rank-num.gold   { background: #F5ECD8; color: #7A5818; }
+.rank-num.silver { background: #EEEBE5; color: #5A5248; }
+.rank-num.bronze { background: #EDE8E0; color: #6A5E50; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.divider { height: 0.5px; background: #E0D8CE; margin: 26px 0; }
+
+ 
+.footer { text-align: center; padding: 26px 16px; border-top: 0.5px solid #E0D8CE; }
+.footer-agent { font-size: 11px; color: #B8A070; letter-spacing: 0.14em; font-style: italic; margin-bottom: 5px; }
+.footer-sub   { font-size: 10px; color: #C0B4A4; letter-spacing: 0.06em; }
+
+.updated { font-size: 10px; color: #B8A890; text-align: right; padding: 12px 16px 0; letter-spacing: 0.06em; }
+
+@media (max-width: 560px) {
+  .two-col { grid-template-columns: 1fr; }
+  .metric-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero { height: 220px; }
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-center">
+    <span class="logo-lypo">Lypo-C</span>
+    <span class="logo-sb">SKINBEAUTY</span>
+  </div>
+  <div class="hero-date" id="report-date"></div>
+</div>
+
+<div class="updated" id="updated-time"></div>
+
+<div class="container">
+
+  
+  <div class="section-header">
+    <span class="section-tag tag-toc">toC</span>
+    <span class="section-name">EC・定期購入</span>
+  </div>
+
+  <div class="metric-grid">
+    <div class="card metric-card">
+      <div class="metric-label">当月売上（出荷ベース・税抜）</div>
+      <div class="metric-value gold" id="monthly-sales">—</div>
+      <div class="metric-sub">全チャネル合計</div>
+    </div>
+    <div class="card metric-card">
+      <div class="metric-label">定期購入者数（ACTIVE）</div>
+      <div class="metric-value gold" id="active-subscribers">—</div>
+      <div class="metric-sub" id="subscriber-diff">前日比 —</div>
+    </div>
+    <div class="card metric-card">
+      <div class="metric-label">定期購入（PAUSED）</div>
+      <div class="metric-value" id="paused-subscribers">—</div>
+      <div class="metric-sub">一時停止中</div>
+    </div>
+  </div>
+
+  
+  <div class="card channel-card">
+    <div class="card-title">チャネル別 当月内訳</div>
+    <div class="channel-bar-wrap">
+      <div class="bar-shopify" id="bar-shopify" style="width:0%"></div>
+      <div class="bar-amazon"  id="bar-amazon"  style="width:0%"></div>
+      <div class="bar-other"   id="bar-other"   style="width:0%"></div>
+    </div>
+    <div class="channel-rows">
+      <div class="channel-row">
+        <span class="channel-name"><span class="channel-dot" style="background:#5A4A38"></span>Shopify（自社EC）</span>
+        <span><span class="channel-amount" id="shopify-amount">—</span><span class="channel-pct" id="shopify-pct"></span></span>
+      </div>
+      <div class="channel-row">
+        <span class="channel-name"><span class="channel-dot" style="background:#C9A96E"></span>Amazon</span>
+        <span><span class="channel-amount" id="amazon-amount">—</span><span class="channel-pct" id="amazon-pct"></span></span>
+      </div>
+      <div class="channel-row">
+        <span class="channel-name"><span class="channel-dot" style="background:#C0B4A4"></span>その他モール</span>
+        <span><span class="channel-amount" id="other-amount">—</span><span class="channel-pct" id="other-pct"></span></span>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="card chart-card">
+    <div class="card-title">当月 日別売上推移（出荷ベース・税抜）</div>
+    <div class="chart-wrap">
+      <canvas id="salesChart"></canvas>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  
+  <div class="section-header">
+    <span class="section-tag tag-tob">toB</span>
+    <span class="section-name">ビジネス事業</span>
+  </div>
+
+  <div class="metric-grid">
+    <div class="card metric-card">
+      <div class="metric-label">当月取り扱い事業者数</div>
+      <div class="metric-value gold" id="monthly-companies">—</div>
+      <div class="metric-sub">社</div>
+    </div>
+    <div class="card metric-card">
+      <div class="metric-label">40万円以上（年間）</div>
+      <div class="metric-value" id="rank-40">—</div>
+      <div class="metric-sub">社</div>
+    </div>
+    <div class="card metric-card">
+      <div class="metric-label">30万円以上（年間）</div>
+      <div class="metric-value" id="rank-30">—</div>
+      <div class="metric-sub">社</div>
+    </div>
+    <div class="card metric-card">
+      <div class="metric-label">20万円以上（年間）</div>
+      <div class="metric-value" id="rank-20">—</div>
+      <div class="metric-sub">社</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card rank-card">
+      <div class="rank-header">
+        当月 取り扱いランク
+        <button class="rank-toggle" onclick="toggleRank('monthly')">TOP30 ▼</button>
+      </div>
+      <table class="rank-table">
+        <thead><tr><th style="width:28px"></th><th>事業者名</th><th class="r">金額</th></tr></thead>
+        <tbody id="monthly-rank-body"></tbody>
+      </table>
+    </div>
+    <div class="card rank-card">
+      <div class="rank-header">
+        今年度累計 取り扱いランク
+        <button class="rank-toggle" onclick="toggleRank('yearly')">TOP30 ▼</button>
+      </div>
+      <table class="rank-table">
+        <thead><tr><th style="width:28px"></th><th>事業者名</th><th class="r">累計</th></tr></thead>
+        <tbody id="yearly-rank-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <div class="footer-agent">かなの24時間365日働くAgentちゃん</div>
+  <div class="footer-sub">BigQuery → GAS → GitHub Pages → Teams</div>
+</div>
+
+<script>
+const DATA = window.DASHBOARD_DATA || {
+  monthly_sales: 5624049,
+  shopify_sales: 3371397,
+  amazon_sales:  1062722,
+  other_sales:   1189950,
+  active_subscribers: 21165,
+  paused_subscribers: 14292,
+  subscriber_diff: -14,
+  monthly_companies: 451,
+  rank_40: 12, rank_30: 28, rank_20: 64,
+  monthly_rank: [
+    {name:'株式会社アトリエはるか',amount:6200000},
+    {name:'ユルットネス',amount:6012000},
+    {name:'株式会社Love Herb',amount:5624178},
+    {name:'Brushing Gloom',amount:4087556},
+    {name:'Wコンサルティング株式会社',amount:3945000},
+    {name:'株式会社JaCath',amount:3794200},
+    {name:'サンシャイン合同会社',amount:3542000},
+    {name:'痩身サロン sourire.',amount:3100000},
+    {name:'伝心天美薬店',amount:2784000},
+    {name:'有限会社カネコ',amount:2272200},
+  ],
+  yearly_rank: [],
+  daily_trend: [
+    {date:'04/01',shopify:0,      amazon:42220,  other:0},
+    {date:'04/02',shopify:370522, amazon:133774, other:109703},
+    {date:'04/03',shopify:321512, amazon:101194, other:44774},
+    {date:'04/04',shopify:115057, amazon:66430,  other:46322},
+    {date:'04/05',shopify:0,      amazon:96590,  other:108453},
+    {date:'04/06',shopify:338039, amazon:34779,  other:209033},
+    {date:'04/07',shopify:118755, amazon:77375,  other:51010},
+    {date:'04/08',shopify:185188, amazon:87238,  other:106183},
+    {date:'04/09',shopify:243831, amazon:82518,  other:66598},
+    {date:'04/10',shopify:160751, amazon:32754,  other:154246},
+    {date:'04/11',shopify:270953, amazon:51936,  other:11727},
+    {date:'04/12',shopify:0,      amazon:11727,  other:16826},
+    {date:'04/13',shopify:395619, amazon:41381,  other:61751},
+    {date:'04/14',shopify:283441, amazon:58308,  other:23682},
+    {date:'04/15',shopify:187348, amazon:109317, other:87371},
+    {date:'04/16',shopify:380381, amazon:35181,  other:92271},
+  ]
+};
+
+function fmtM(n) {
+  if (!n && n !== 0) return '—';
+  if (n >= 1000000) return '¥' + (n/1000000).toFixed(1) + 'M';
+  return '¥' + Math.round(n/1000).toLocaleString() + 'K';
+}
+
+function rankBadge(i) {
+  const cls = i===0?'gold':i===1?'silver':i===2?'bronze':'';
+  return `<span class="rank-num ${cls}">${i+1}</span>`;
+}
+
+function renderRank(tbodyId, data, showAll) {
+  const tbody = document.getElementById(tbodyId);
+  if (!tbody || !data) return;
+  const rows = showAll ? data : data.slice(0, 10);
+  tbody.innerHTML = rows.map((r,i) =>
+    `<tr><td>${rankBadge(i)}</td><td>${r.name}</td><td class="r">${fmtM(r.amount)}</td></tr>`
+  ).join('');
+}
+
+const rankState = {monthly:false, yearly:false};
+function toggleRank(type) {
+  rankState[type] = !rankState[type];
+  const id = type==='monthly' ? 'monthly-rank-body' : 'yearly-rank-body';
+  const d  = type==='monthly' ? DATA.monthly_rank : DATA.yearly_rank;
+  renderRank(id, d, rankState[type]);
+  const btn = document.querySelector(`button[onclick="toggleRank('${type}')"]`);
+  btn.textContent = rankState[type] ? 'TOP10 ▲' : 'TOP30 ▼';
+}
+
+function buildChart() {
+  const td = DATA.daily_trend;
+  if (!td || !td.length) return;
+
+  new Chart(document.getElementById('salesChart'), {
+    type: 'bar',
+    data: {
+      labels: td.map(r => r.date),
+      datasets: [
+        {
+          label: 'Shopify',
+          data: td.map(r => Math.round((r.shopify||0)/1000)),
+          backgroundColor: '#5A4A38',
+          borderRadius: 1,
+          borderSkipped: false,
+        },
+        {
+          label: 'Amazon',
+          data: td.map(r => Math.round((r.amazon||0)/1000)),
+          backgroundColor: '#C9A96E',
+          borderRadius: 1,
+          borderSkipped: false,
+        },
+        {
+          label: 'その他モール',
+          data: td.map(r => Math.round((r.other||0)/1000)),
+          backgroundColor: '#C0B4A4',
+          borderRadius: 1,
+          borderSkipped: false,
+        },
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            boxWidth: 10,
+            font: { size: 10, family: 'Cormorant Garamond' },
+            color: '#8A8078',
+            padding: 14,
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}  ¥${ctx.parsed.y.toLocaleString()}K`
+          },
+          bodyFont: { size: 11 },
+          titleFont: { size: 11 },
+        }
+      },
+      scales: {
+        x: {
+          stacked: true,
+          grid: { display: false },
+          ticks: { color: '#9A8878', font: { size: 9 }, maxRotation: 0 }
+        },
+        y: {
+          stacked: true,
+          grid: { color: '#F0EBE3' },
+          border: { display: false },
+          ticks: {
+            color: '#9A8878',
+            font: { size: 9 },
+            callback: v => '¥' + v.toLocaleString() + 'K'
+          }
+        }
+      }
+    }
+  });
+}
+
+function init() {
+  const now = new Date();
+  document.getElementById('report-date').textContent =
+    now.toLocaleDateString('ja-JP', {year:'numeric', month:'long', day:'numeric', weekday:'short'});
+  document.getElementById('updated-time').textContent =
+    'データ更新  ' + now.toLocaleTimeString('ja-JP', {hour:'2-digit', minute:'2-digit'});
+
+  if (DATA.monthly_sales)      document.getElementById('monthly-sales').textContent      = fmtM(DATA.monthly_sales);
+  if (DATA.active_subscribers) document.getElementById('active-subscribers').textContent = DATA.active_subscribers.toLocaleString() + '名';
+  if (DATA.paused_subscribers) document.getElementById('paused-subscribers').textContent = DATA.paused_subscribers.toLocaleString() + '名';
+  if (DATA.subscriber_diff != null) {
+    const d = DATA.subscriber_diff;
+    document.getElementById('subscriber-diff').textContent = '前日比  ' + (d >= 0 ? '+' : '') + d + '名';
+  }
+
+  const s = DATA.shopify_sales||0, a = DATA.amazon_sales||0, o = DATA.other_sales||0, t = s+a+o;
+  if (t > 0) {
+    const sp = Math.round(s/t*100), ap = Math.round(a/t*100), op = 100-sp-ap;
+    document.getElementById('bar-shopify').style.width = sp + '%';
+    document.getElementById('bar-amazon').style.width  = ap + '%';
+    document.getElementById('bar-other').style.width   = op + '%';
+    document.getElementById('shopify-amount').textContent = fmtM(s);
+    document.getElementById('shopify-pct').textContent    = sp + '%';
+    document.getElementById('amazon-amount').textContent  = fmtM(a);
+    document.getElementById('amazon-pct').textContent     = ap + '%';
+    document.getElementById('other-amount').textContent   = fmtM(o);
+    document.getElementById('other-pct').textContent      = op + '%';
+  }
+
+  if (DATA.monthly_companies != null) document.getElementById('monthly-companies').textContent = DATA.monthly_companies.toLocaleString();
+  if (DATA.rank_40 != null) document.getElementById('rank-40').textContent = DATA.rank_40.toLocaleString();
+  if (DATA.rank_30 != null) document.getElementById('rank-30').textContent = DATA.rank_30.toLocaleString();
+  if (DATA.rank_20 != null) document.getElementById('rank-20').textContent = DATA.rank_20.toLocaleString();
+
+  renderRank('monthly-rank-body', DATA.monthly_rank, false);
+  renderRank('yearly-rank-body', DATA.yearly_rank, false);
+  buildChart();
+}
+init();
+</script>
+</body>
+</html>
